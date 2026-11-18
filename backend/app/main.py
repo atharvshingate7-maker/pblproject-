@@ -12,7 +12,7 @@ from app.core.errors import (
     unhandled_exception_handler
 )
 from app.db.session import engine, Base
-from app.api.routes import health, files, analysis
+from app.api.routes import health, files, analysis, cases
 
 # Configure logging
 logging.basicConfig(
@@ -75,6 +75,7 @@ def create_application() -> FastAPI:
     app.include_router(health.router, prefix=prefix)
     app.include_router(files.router, prefix=prefix)
     app.include_router(analysis.router, prefix=prefix)
+    app.include_router(cases.router, prefix=prefix)
 
     return app
 

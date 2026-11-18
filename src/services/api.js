@@ -1,15 +1,13 @@
 import axios from 'axios';
 
-// Base Axios instance — swap baseURL to your FastAPI endpoint when ready
+// ─── Axios Instance ─────────────────────────────────────────────────────────
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
   timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Request interceptor — attach auth token
+// ─── Request Interceptor: attach JWT token ───────────────────────────────────
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('cyberintel_token');
@@ -21,12 +19,13 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor — handle global errors
+// ─── Response Interceptor: handle global errors ──────────────────────────────
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('cyberintel_token');
+      localStorage.removeItem('cyberintel_user');
       window.location.href = '/login';
     }
     return Promise.reject(error);

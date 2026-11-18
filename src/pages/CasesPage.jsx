@@ -1,9 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Search, Filter, Plus, FolderOpen, AlertTriangle,
   Clock, CheckCircle2, ChevronRight, Upload, BarChart2,
-  Shield, FileText, ArrowRight, Sparkles, Terminal, Network
+  Shield, FileText, ArrowRight, Sparkles, Terminal, Network, RefreshCw
 } from 'lucide-react';
 import { mockCases, caseTypes, riskLevels, statusOptions } from '../data/mockCases';
 import { mockRCAReports } from '../data/mockRCAReports';
@@ -11,6 +11,7 @@ import RCAReportModal from '../components/common/RCAReportModal';
 import { formatDate } from '../utils/formatters';
 import { riskConfig, statusConfig } from '../utils/riskColors';
 import { cyberAudio } from '../utils/cyberAudio';
+import { caseService } from '../services/caseService';
 
 export default function CasesPage() {
   const [search, setSearch] = useState('');
@@ -18,9 +19,29 @@ export default function CasesPage() {
   const [statusFilter, setStatusFilter] = useState('All Status');
   const [typeFilter, setTypeFilter] = useState('All Types');
   const [activeRCACaseId, setActiveRCACaseId] = useState(null);
+  const [cases, setCases] = useState(mockCases);
+  const [loadingCases, setLoadingCases] = useState(false);
+  const [backendOnline, setBackendOnline] = useState(false);
+
+  // Load cases from backend on mount
+  const loadCases = useCallback(async () => {
+    setLoadingCases(true);
+    try {
+      const { data } = await caseService.getCases({ search, status: statusFilter, risk: riskFilter });
+      setCases(data);
+      setBackendOnline(true);
+    } catch {
+      setCases(mockCases);
+      setBackendOnline(false);
+    } finally {
+      setLoadingCases(false);
+    }
+  }, [search, statusFilter, riskFilter]);
+
+  useEffect(() => { loadCases(); }, [loadCases]);
 
   const filtered = useMemo(() => {
-    return mockCases.filter(c => {
+    return cases.filter(c => {
       const q = search.toLowerCase();
       const matchSearch = !q || c.title.toLowerCase().includes(q) || c.company.toLowerCase().includes(q) || c.id.toLowerCase().includes(q);
       const matchRisk   = riskFilter   === 'All Risk Levels' || c.risk   === riskFilter.toLowerCase();
@@ -28,7 +49,7 @@ export default function CasesPage() {
       const matchType   = typeFilter   === 'All Types'        || c.type   === typeFilter;
       return matchSearch && matchRisk && matchStatus && matchType;
     });
-  }, [search, riskFilter, statusFilter, typeFilter]);
+  }, [cases, search, riskFilter, statusFilter, typeFilter]);
 
   const riskScoreBar = (score) => {
     return (
@@ -96,19 +117,42 @@ export default function CasesPage() {
             </p>
           </div>
 
-          <Link
-            to="/cases/new"
-            onClick={() => cyberAudio.playLaserBlip()}
-            className="btn-pill btn-pill-primary"
-            style={{
-              padding: '0.65rem 1.5rem',
-              fontSize: '0.86rem',
-            }}
-          >
-            <Plus size={16} color="#060608" strokeWidth={2.4} />
-            <span>Create New Case</span>
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '0.4rem',
+              padding: '0.3rem 0.75rem', borderRadius: '9999px',
+              background: backendOnline ? 'rgba(5,150,105,0.12)' : 'rgba(100,116,139,0.12)',
+              border: `1px solid ${backendOnline ? 'rgba(5,150,105,0.35)' : 'rgba(100,116,139,0.25)'}`,
+              fontSize: '0.7rem', fontWeight: 700, color: backendOnline ? '#10b981' : '#94a3b8',
+              textTransform: 'uppercase', letterSpacing: '0.07em',
+            }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: backendOnline ? '#10b981' : '#94a3b8', flexShrink: 0 }} />
+              {backendOnline ? 'Live DB' : 'Mock Data'}
+            </div>
+            <button
+              onClick={() => { cyberAudio.playChirp(800, 0.02); loadCases(); }}
+              disabled={loadingCases}
+              title="Refresh from backend"
+              style={{
+                width: 36, height: 36, borderRadius: '50%', cursor: 'pointer',
+                background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)',
+                color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <RefreshCw size={15} style={{ animation: loadingCases ? 'spin 0.8s linear infinite' : 'none' }} />
+            </button>
+            <Link
+              to="/cases/new"
+              onClick={() => cyberAudio.playLaserBlip()}
+              className="btn-pill btn-pill-primary"
+              style={{ padding: '0.65rem 1.5rem', fontSize: '0.86rem' }}
+            >
+              <Plus size={16} color="#060608" strokeWidth={2.4} />
+              <span>Create New Case</span>
+            </Link>
+          </div>
         </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
         {/* Filter Controls Bar */}
         <div style={{

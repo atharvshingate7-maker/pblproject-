@@ -20,7 +20,13 @@ class Settings(BaseSettings):
 
     # Frontend Origin & CORS
     FRONTEND_ORIGIN: str = "http://localhost:5173"
-    CORS_ORIGINS: List[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+        "http://localhost:3000"
+    ]
 
     @field_validator("SUPABASE_URL", mode="after")
     def clean_supabase_url(cls, v: str) -> str:
@@ -43,7 +49,13 @@ class Settings(BaseSettings):
             return [i.strip() for i in v.split(",") if i.strip()]
         elif isinstance(v, list):
             return v
-        return ["http://localhost:5173", "http://127.0.0.1:5173"]
+        return [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "http://localhost:5174",
+            "http://127.0.0.1:5174",
+            "http://localhost:3000"
+        ]
 
     # File uploads
     MAX_FILE_SIZE_MB: int = 50

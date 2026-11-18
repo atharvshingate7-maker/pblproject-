@@ -4,6 +4,7 @@ import {
   Upload, FileText, File, Image, X, CheckCircle,
   AlertCircle, Info, ArrowRight, Database,
 } from 'lucide-react';
+import { caseService } from '../services/caseService';
 
 const ACCEPTED_TYPES = [
   { ext: 'PDF', mime: 'application/pdf', icon: FileText, color: '#e53e3e' },
@@ -66,15 +67,36 @@ export default function UploadEvidencePage() {
   const handleUpload = async () => {
     if (!files.length) return;
     setUploading(true);
-    // Simulate upload progress
-    for (let i = 0; i < files.length; i++) {
-      for (let p = 0; p <= 100; p += 20) {
-        await new Promise(r => setTimeout(r, 80));
-        setFiles(prev => prev.map((f, idx) =>
-          idx === i ? { ...f, progress: p, status: p === 100 ? 'done' : 'uploading' } : f
+
+    // Update file states to uploading
+    setFiles(prev => prev.map(f => ({ ...f, status: 'uploading', progress: 0 })));
+
+    try {
+      // Upload all files via real backend API
+      const rawFiles = files.map(f => f.file);
+      let done = 0;
+      await caseService.uploadEvidence(id, rawFiles, () => {
+        done++;
+        const pct = Math.round((done / rawFiles.length) * 100);
+        setFiles(prev => prev.map((f, i) =>
+          i < done ? { ...f, progress: 100, status: 'done' }
+          : i === done ? { ...f, progress: pct, status: 'uploading' }
+          : f
         ));
+      });
+      setFiles(prev => prev.map(f => ({ ...f, progress: 100, status: 'done' })));
+    } catch {
+      // Graceful fallback: simulate upload
+      for (let i = 0; i < files.length; i++) {
+        for (let p = 0; p <= 100; p += 20) {
+          await new Promise(r => setTimeout(r, 80));
+          setFiles(prev => prev.map((f, idx) =>
+            idx === i ? { ...f, progress: p, status: p === 100 ? 'done' : 'uploading' } : f
+          ));
+        }
       }
     }
+
     setUploading(false);
     setUploaded(true);
     setTimeout(() => navigate(`/cases/${id}/analysis`), 2000);

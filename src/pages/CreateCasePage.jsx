@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { caseTypes } from '../data/mockCases';
+import { caseService } from '../services/caseService';
 
 const OFFICERS = ['Atharv Shingate (You)', 'Officer Verma', 'Officer Mehra', 'Officer Patel', 'Officer Singh'];
 
@@ -67,10 +68,16 @@ export default function CreateCasePage() {
     const e2 = validate();
     if (Object.keys(e2).length) { setErrors(e2); return; }
     setLoading(true);
-    await new Promise(r => setTimeout(r, 1000));
-    setLoading(false);
-    setSubmitted(true);
-    setTimeout(() => navigate('/cases'), 2000);
+    try {
+      await caseService.createCase(form);
+      setSubmitted(true);
+      setTimeout(() => navigate('/cases'), 2000);
+    } catch (err) {
+      console.error('Failed to create case:', err);
+      setErrors({ submit: 'Failed to create case. Please try again.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (submitted) return (
