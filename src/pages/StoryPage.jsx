@@ -15,6 +15,7 @@ import bgVelocityImg from '../assets/bg_velocity.jpg';
 import bgSokolovaImg from '../assets/bg_sokolova.jpg';
 import DitherHelixCarousel from '../components/ui/DitherHelixCarousel';
 import AnimatedTestimonialsCarousel from '../components/ui/AnimatedTestimonialsCarousel';
+import BackendHubFrame from '../components/backend/BackendHubFrame';
 
 /* ─── Liquid Glassmorphism Core Style ───────────────────────── */
 const liquidGlassCard = {
@@ -705,6 +706,7 @@ export default function StoryPage() {
       <HeroFrame />
       <AttackGraphFrame />
       <CasesFrame />
+      <BackendHubFrame />
       <TestimonialsFrame />
     </div>
   );

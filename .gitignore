@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+backend/venv/
+venv/
+__pycache__/
+*.pyc
+
+# Environment Files
+.env
+.env.*
+!.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+
+# Build Outputs
+dist/
+build/
+*.egg-info/
+
+# Local DB & Uploads
+*.db
+backend/*.db
+backend/uploads/
+uploads/
+
+# Logs & System
+*.log
+.DS_Store

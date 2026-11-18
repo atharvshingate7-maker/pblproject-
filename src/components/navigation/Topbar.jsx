@@ -4,7 +4,7 @@ import {
   Bell, Shield, Check, AlertTriangle, FileText,
   Upload, LogOut, ChevronDown, CheckCheck, Sparkles,
   ExternalLink, UserCheck, Volume2, VolumeX, Clock,
-  Network, MessageSquareQuote, FolderOpen, Plus, Menu, X
+  Network, MessageSquareQuote, FolderOpen, Plus, Menu, X, Database
 } from 'lucide-react';
 import { useAuth, CURRENT_USER } from '../../context/AuthContext';
 import { cyberAudio } from '../../utils/cyberAudio';
@@ -127,7 +127,7 @@ export default function Topbar() {
   // Track active section as user scrolls
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['hero', 'attack-graph', 'cases', 'testimonials'];
+      const sections = ['hero', 'attack-graph', 'cases', 'backend', 'testimonials'];
       for (const sectionId of sections) {
         const el = document.getElementById(sectionId);
         if (el) {
@@ -157,6 +157,7 @@ export default function Topbar() {
     { label: 'Home',            scrollId: 'hero',          icon: Shield },
     { label: 'Attacking Graph', scrollId: 'attack-graph',  icon: Network },
     { label: 'Cases & RCA',     scrollId: 'cases',         icon: FolderOpen },
+    { label: 'Backend Hub',     scrollId: 'backend',       icon: Database },
     { label: 'Testimonials',    scrollId: 'testimonials',  icon: MessageSquareQuote },
   ];
 

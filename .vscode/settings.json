@@ -1,0 +1,14 @@
+{
+  "python.defaultInterpreterPath": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+  "python.pythonPath": "/Library/Frameworks/Python.framework/Versions/3.14/bin/python3",
+  "python.analysis.extraPaths": [
+    "/Library/Frameworks/Python.framework/Versions/3.14/lib/python3.14/site-packages",
+    "${workspaceFolder}/backend"
+  ],
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "python.envFile": "${workspaceFolder}/backend/.env"
+}
